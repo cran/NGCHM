@@ -1,7 +1,7 @@
 Type: Package
 Package: NGCHM
 Title: Next Generation Clustered Heat Maps
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person(c("Bradley", "M"), "Broom", , "bmbroom@mdanderson.org", role = "aut",
            comment = c(ORCID = "0000-0002-0915-3164")),
@@ -28,12 +28,13 @@ Additional_repositories:
         https://md-anderson-bioinformatics.r-universe.dev
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Collate: 'allClasses.R' 'allGenerics.R' 'allMethods.R' 'functions.R'
-        'chmFromJSON.R' 'dendrogram-fixes.R' 'shaidy.R' 'ngchmshaidy.R'
-        'zzz.R' 'package.R'
-SystemRequirements: Java (>= 8.0) Git
+Collate: 'internalFunctions.R' 'allClasses.R' 'allGenerics.R'
+        'allMethods.R' 'functions.R' 'chmFromJSON.R'
+        'dendrogram-fixes.R' 'shaidy.R' 'ngchmshaidy.R' 'zzz.R'
+        'package.R'
+SystemRequirements: Java (>= 11) Git
 NeedsCompilation: no
-Packaged: 2024-01-16 14:09:52 UTC; marohrdanz
+Packaged: 2024-03-27 18:15:45 UTC; marohrdanz
 Author: Bradley M Broom [aut] (<https://orcid.org/0000-0002-0915-3164>),
   Mary A Rohrdanz [ctb, cre],
   Chris Wakefield [ctb],
@@ -41,4 +42,4 @@ Author: Bradley M Broom [aut] (<https://orcid.org/0000-0002-0915-3164>),
   MD Anderson Cancer Center [cph]
 Maintainer: Mary A Rohrdanz <marohrdanz@mdanderson.org>
 Repository: CRAN
-Date/Publication: 2024-01-16 18:10:05 UTC
+Date/Publication: 2024-03-28 16:00:17 UTC
