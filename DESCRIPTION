@@ -1,7 +1,7 @@
 Type: Package
 Package: NGCHM
 Title: Next Generation Clustered Heat Maps
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person(c("Bradley", "M"), "Broom", , "bmbroom@mdanderson.org", role = "aut",
            comment = c(ORCID = "0000-0002-0915-3164")),
@@ -34,7 +34,7 @@ Collate: 'internalFunctions.R' 'allClasses.R' 'allGenerics.R'
         'package.R'
 SystemRequirements: Java (>= 11) Git
 NeedsCompilation: no
-Packaged: 2024-03-27 18:15:45 UTC; marohrdanz
+Packaged: 2024-05-08 13:03:06 UTC; marohrdanz
 Author: Bradley M Broom [aut] (<https://orcid.org/0000-0002-0915-3164>),
   Mary A Rohrdanz [ctb, cre],
   Chris Wakefield [ctb],
@@ -42,4 +42,4 @@ Author: Bradley M Broom [aut] (<https://orcid.org/0000-0002-0915-3164>),
   MD Anderson Cancer Center [cph]
 Maintainer: Mary A Rohrdanz <marohrdanz@mdanderson.org>
 Repository: CRAN
-Date/Publication: 2024-03-28 16:00:17 UTC
+Date/Publication: 2024-05-08 21:10:10 UTC

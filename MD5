@@ -1,11 +1,11 @@
-f4899c6f7878d4115a32ae9047f84b5a *DESCRIPTION
+c79a544ae14e00572fd666134561b47e *DESCRIPTION
 2c7073360a37f084728a8ddb22e34e4c *NAMESPACE
 c6c1e8a207a030161af59e924c823a53 *R/allClasses.R
 dcd21b2bd20eba1ceac5e6ac36514034 *R/allGenerics.R
 a3de31f478262b9d0effd4185677c02f *R/allMethods.R
 34db3a293f962f1431b5f72e21ed30be *R/chmFromJSON.R
 4e764f413c41ce8cf68b85a3ec2c08bc *R/dendrogram-fixes.R
-3d5ac445c2b87690aec11f3931d3a0ef *R/functions.R
+e1fef2391a6606aa9e8aefa7da75eb45 *R/functions.R
 31f4515f1c908f6ee83db26b7ea0554c *R/internalFunctions.R
 6875a37a02ca3233d0cbc153b4703b9b *R/ngchmshaidy.R
 ecc79c956069a698c2f1676f743665dd *R/package.R
