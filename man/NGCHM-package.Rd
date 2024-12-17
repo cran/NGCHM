@@ -58,8 +58,6 @@ See NGCHM-initialization for details.
   rownames(mat) <- sprintf("ABCA\%d", 1:10)
   colnames(mat) <- sprintf("Sample\%d", 1:10)
   chm <- chmNew("my-chm", mat)
-  chmSetCollection("//server/collection")
-  chmInstall(chm)
 }
 }
 \seealso{
@@ -76,4 +74,20 @@ See NGCHM-initialization for details.
 \code{\link[=chmInstall]{chmInstall()}}
 
 \linkS4class{ngchm}
+}
+\author{
+\strong{Maintainer}: Mary A Rohrdanz \email{marohrdanz@mdanderson.org} [contributor]
+
+Authors:
+\itemize{
+  \item Bradley M Broom \email{bmbroom@mdanderson.org} (\href{https://orcid.org/0000-0002-0915-3164}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Chris Wakefield \email{cwakefield@mdanderson.org} [contributor]
+  \item James M Melott \email{jmmelott@mdanderson.org} [contributor]
+  \item MD Anderson Cancer Center [copyright holder]
+}
+
 }

@@ -306,6 +306,15 @@ chmDefaultColOrder <- function(chm) {
     } else {
       dd <- dist(t(mat), method = chm@colDist)
     }
+    if (any(is.na(dd)) || any(is.nan(dd)) || any(is.infinite(dd))) {
+      dd_matrix <- as.matrix(dd)
+      naNames <- rownames(dd_matrix)[apply(dd_matrix, 1, function(x) {any(is.na(x)) || any(is.nan(x)) || any(is.infinite(x))})]
+      errorMsg <- paste("Unable to cluster columns. Distance matrix has", length(naNames), "rows/cols with NA/NaN/Inf values.")
+      if (length(naNames) < 20) {
+        errorMsg <- paste(errorMsg, paste("\n  Distance matrix rows/cols with NA/NaN/Inf values:", paste(head(naNames), collapse = ", ")))
+      }
+      stop(errorMsg)
+    }
     ddg <- stats::as.dendrogram(stats::hclust(dd, method = chm@colAgglom))
     res <- list(ngchmSaveAsDendrogramBlob(shaidyRepo, ddg))
     shaidyRepo$provenanceDB$insert(provid, res[[1]])
@@ -359,6 +368,15 @@ chmDefaultRowOrder <- function(chm) {
       dd <- cos.dist1(mat)
     } else {
       dd <- dist(mat, method = chm@rowDist)
+    }
+    if (any(is.na(dd)) || any(is.nan(dd)) || any(is.infinite(dd))) {
+      dd_matrix <- as.matrix(dd)
+      naNames <- rownames(dd_matrix)[apply(dd_matrix, 1, function(x) {any(is.na(x)) || any(is.nan(x)) || any(is.infinite(x))})]
+      errorMsg <- paste("Unable to cluster rows. Distance matrix has", length(naNames), "rows/cols with NA/NaN/Inf values.")
+      if (length(naNames) < 20) {
+        errorMsg <- paste(errorMsg, paste("\n  Distance matrix rows/cols with NA/NaN/Inf values:", paste(head(naNames), collapse = ", ")))
+      }
+      stop(errorMsg)
     }
     ddg <- stats::as.dendrogram(stats::hclust(dd, method = chm@rowAgglom))
     res <- list(ngchmSaveAsDendrogramBlob(shaidyRepo, ddg))
@@ -581,6 +599,7 @@ chmNewDataLayer <- function(label, data, colors, summarizationMethod, cuts_color
   if (length(cuts_color) != 1) {
     stop(sprintf("Parameter 'cuts_color' must have a single value, not %d", length(cuts_color)))
   }
+  cuts_color <- validateColor(cuts_color)
   summarizationMethod <- match.arg(summarizationMethod, c("average", "sample", "mode"))
   data <- ngchmSaveAsDatasetBlob(ngchm.env$tmpShaidy, "tsv", data)
   if (length(colors) == 0) {
@@ -1356,7 +1375,7 @@ chmNewColorMap <- function(values, colors = NULL, names = NULL, shapes = NULL, z
   if (!is.null(zs) && length(zs) != NC) {
     stop(sprintf("chmNewColorMap: number of zindices (%d) does not equal number of colors (%d). It should.", length(zs), NC))
   }
-  grDevices::col2rgb(missing.color) # error check
+  missing.color <- validateColor(missing.color)
 
   # Construct ValueMap
   pts <- chmAddValueProperty(NULL, value = values, color = colors, name = names, shape = shapes, z = zs)
@@ -1375,7 +1394,7 @@ chmAddValueProperty <- function(vps, value, color, name = NULL, shape = NULL, z 
   if (any(z < 0)) {
     stop("z must be non-negative")
   }
-  grDevices::col2rgb(color) # error check
+  color <- validateColor(color)
   for (ii in 1:length(value)) {
     vps <- append(vps, new(Class = "ngchmValueProp", value = value[ii], color = color[ii], name = name[ii], shape = shape[ii], z = z[ii]))
   }
@@ -3746,9 +3765,12 @@ chmExportToFile <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shai
     stop("Missing required java version.")
   }
   if (missing(shaidyMapGenArgs)) shaidyMapGenArgs <- strsplit(Sys.getenv("SHAIDYMAPGENARGS"), ",")[[1]]
-  if (shaidyMapGen == "") {
-    checkForNGCHMSupportFiles()
-    stop("Missing required path to ShaidyMapGen.jar file.")
+  if (shaidyMapGen == "") { # make last-ditch effort to set SHAIDYMAPGEN by loading NGCHMSupportFiles
+    if (!checkForNGCHMSupportFilesENVs()) loadNGCHMSupportFiles()
+    shaidyMapGen <- Sys.getenv("SHAIDYMAPGEN")
+    if (shaidyMapGen == "") {
+      stop("Missing required path to ShaidyMapGen.jar file. Please install NGCHMSupportFiles and try again.")
+    }
   }
   chm@format <- "shaidy"
   chm <- chmAddProperty(chm, "chm.info.build.time", format(Sys.time(), "%F %H:%M:%S"))
@@ -3790,9 +3812,12 @@ chmExportToFile <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shai
 chmExportToPDF <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shaidyMapGenJava, shaidyMapGenArgs) {
   if (!overwrite && file.exists(filename)) stop("'filename' already exists")
   if (missing(shaidyMapGen)) shaidyMapGen <- Sys.getenv("SHAIDYMAPGEN")
-  if (shaidyMapGen == "") {
-    checkForNGCHMSupportFiles()
-    stop("Missing required path to ShaidyMapGen.jar file.")
+  if (shaidyMapGen == "") { # make last-ditch effort to set SHAIDYMAPGEN by loading NGCHMSupportFiles
+    if (!checkForNGCHMSupportFilesENVs()) loadNGCHMSupportFiles()
+    shaidyMapGen <- Sys.getenv("SHAIDYMAPGEN")
+    if (shaidyMapGen == "") {
+      stop("Missing required path to ShaidyMapGen.jar file. Please install NGCHMSupportFiles and try again.")
+    }
   }
   if (missing(shaidyMapGenJava)) shaidyMapGenJava <- Sys.getenv("SHAIDYMAPGENJAVA")
   if (shaidyMapGenJava == "") shaidyMapGenJava <- "java"
@@ -3836,8 +3861,8 @@ chmExportToPDF <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shaid
 #' @export
 #' @rdname chmExportToHTML-method
 #'
-#' @param chm The NGCHM to generate the PDF for
-#' @param filename The file in which to save the PDF
+#' @param chm The NGCHM to generate the HTML for
+#' @param filename The file in which to save the HTML
 #' @param overwrite Overwrite file iff true (default false)
 #' @param shaidyMapGen Path to shaidyMapGen jar file (default to value of environment variable SHAIDYMAPGEN)
 #' @param shaidyMapGenJava Path to java executable with which to run shaidyMapGen (default to value of environment variable SHAIDYMAPGENJAVA or java)
@@ -3848,9 +3873,12 @@ chmExportToPDF <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shaid
 chmExportToHTML <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shaidyMapGenJava, shaidyMapGenArgs, ngchmWidgetPath) {
   if (!overwrite && file.exists(filename)) stop("'filename' already exists")
   if (missing(shaidyMapGen)) shaidyMapGen <- Sys.getenv("SHAIDYMAPGEN")
-  if (shaidyMapGen == "") {
-    checkForNGCHMSupportFiles()
-    stop("Missing required path to ShaidyMapGen.jar file.")
+  if (shaidyMapGen == "") { # make last-ditch effort to set SHAIDYMAPGEN by loading NGCHMSupportFiles
+    if (!checkForNGCHMSupportFilesENVs()) loadNGCHMSupportFiles()
+    shaidyMapGen <- Sys.getenv("SHAIDYMAPGEN")
+    if (shaidyMapGen == "") {
+      stop("Missing required path to ShaidyMapGen.jar file. Please install NGCHMSupportFiles and try again.")
+    }
   }
   if (missing(shaidyMapGenJava)) shaidyMapGenJava <- Sys.getenv("SHAIDYMAPGENJAVA")
   if (shaidyMapGenJava == "") shaidyMapGenJava <- "java"
@@ -3859,9 +3887,12 @@ chmExportToHTML <- function(chm, filename, overwrite = FALSE, shaidyMapGen, shai
   }
   if (missing(shaidyMapGenArgs)) shaidyMapGenArgs <- strsplit(Sys.getenv("SHAIDYMAPGENARGS"), ",")[[1]]
   if (missing(ngchmWidgetPath)) ngchmWidgetPath <- Sys.getenv("NGCHMWIDGETPATH")
-  if (ngchmWidgetPath == "") {
-    checkForNGCHMSupportFiles()
-    stop("Missing required path to ngchmWidget-min.js file.")
+  if (ngchmWidgetPath == "") { # make last-ditch effort to set NGCHMWIDGETPATH by loading NGCHMSupportFiles
+    if (!checkForNGCHMSupportFilesENVs()) loadNGCHMSupportFiles()
+    ngchmWidgetPath <- Sys.getenv("NGCHMWIDGETPATH")
+    if (ngchmWidgetPath == "") {
+      stop("Missing required path to ngchmWidget-min.js file. Please install NGCHMSupportFiles and try again.")
+    }
   }
 
   if (length(chmProperty(chm, "chm.info.build.time")) == 0) {
@@ -4000,23 +4031,39 @@ chmAddTSNE <- function(hm, axis, tsne, pointIds, basename = "TSNE") {
 #' @seealso [chmAddReducedDim()]
 
 chmAddPCA <- function(hm, axis, prc, basename = "PC", ndim = 2) {
-  stopifnot(is(hm, "ngchmVersion2"))
-  stopifnot(mode(axis) == "character" && length(axis) == 1)
-  stopifnot(axis == "row" || axis == "column")
-  stopifnot(mode(basename) == "character" && length(basename) == 1)
-  stopifnot(mode(ndim) == "numeric" && length(basename) == 1)
+  if (!is(hm, "ngchmVersion2")) {
+    stop("First argument (hm) must be an ngchmVersion2 object.")
+  }
+  if (mode(axis) != "character" || length(axis) != 1) {
+    stop("Second argument (axis) must be a single string: either 'row' or 'column'.")
+  }
+  if (axis != "column" && axis != "row") {
+    stop("Second argument (axis) must be either 'row' or 'column'.")
+  }
+  if (mode(basename) != "character" || length(basename) != 1) {
+    stop("Fourth argument (basename) must be a single string.")
+  }
+  if (mode(ndim) != "numeric" || length(ndim) != 1) {
+    stop("Fifth argument (ndim) must be a single numeric value.")
+  }
+  if (!is(prc, "prcomp")) {
+    stop("Third argument (prc) must be a prcomp object.")
+  }
+  if (is.null(prc$x)) {
+    stop("No principal component coordinates (prc$x) found in the prcomp object.")
+  }
 
-  pointIds <- rownames(prc$rotation)
-  for (idx in 1:min(ncol(prc$rotation), ndim)) {
-    coordname <- sprintf("%s.coordinate.%d", basename, idx)
-    vals <- prc$rotation[, idx]
-    names(vals) <- pointIds
-    minv <- min(vals, na.rm = TRUE)
-    maxv <- max(vals, na.rm = TRUE)
-    midv <- if (minv * maxv < 0) 0.0 else (minv + maxv) / 2.0
-    cmap <- chmNewColorMap(c(minv, midv, maxv), colors = c("#00007f", "#d0d0d0", "#7f0000"))
-    cv <- chmNewCovariate(coordname, vals, cmap)
-    hm <- chmAddCovariateBar(hm, axis, cv, display = "hidden")
+  for (idx in 1:min(ndim, dim(prc$x)[2])) {
+    covariate_values = prc$x[, idx]
+    # make color map with 3 breakpoints
+    minv <- min(covariate_values) # low breakpoint
+    maxv <- max(covariate_values) # upper breakpoint
+    midbp <- if (minv * maxv < 0) 0.0 else (minv + maxv) / 2.0 # if pos and neg values, use 0 as middle breakpoint
+    color_map <- chmNewColorMap(c(minv, midbp, maxv), c("#00007f", "#d0d0d0", "#7f0000"))
+    # add covariate bar to heatmap
+    covariate_name <- sprintf("%s.coordinate.%d", basename, idx)
+    covariate <- chmNewCovariate(covariate_name, covariate_values, color_map)
+    hm <- chmAddCovariateBar(hm, axis, covariate, display = "hidden")
   }
   return(hm)
 }
@@ -4053,7 +4100,7 @@ chmAddPCA <- function(hm, axis, prc, basename = "PC", ndim = 2) {
 #'
 #' @param hm The NGCHM to add the coordinates to.
 #' @param axis The NGCHM axis ("row" or "column") to add the coordinates to.
-#' @param umap TSNE coordinates (output of [umap::umap()](https://CRAN.R-project.org/package=umap)) for the specified NGCHM axis.
+#' @param umap UMAP coordinates (output of [umap::umap()](https://CRAN.R-project.org/package=umap)) for the specified NGCHM axis.
 #' @param basename The prefix to use for the coordinate names.
 #'
 #' @return The NGCHM with added coordinates.

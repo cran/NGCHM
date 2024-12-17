@@ -1,13 +1,13 @@
 Type: Package
 Package: NGCHM
 Title: Next Generation Clustered Heat Maps
-Version: 1.0.3
+Version: 1.0.4
 Authors@R: c(
     person(c("Bradley", "M"), "Broom", , "bmbroom@mdanderson.org", role = "aut",
            comment = c(ORCID = "0000-0002-0915-3164")),
     person(c("Mary", "A"), "Rohrdanz", , "marohrdanz@mdanderson.org", role = c("ctb", "cre")),
     person("Chris", "Wakefield", , "cwakefield@mdanderson.org", role = "ctb"),
-    person("James", "Melott", , "jmmelott@mdanderson.org", role = "ctb"),
+    person(c("James", "M"), "Melott", , "jmmelott@mdanderson.org", role = "ctb"),
     person("MD Anderson Cancer Center", role = "cph")
   )
 Description: Next-Generation Clustered Heat Maps (NG-CHMs) allow for
@@ -19,7 +19,7 @@ Description: Next-Generation Clustered Heat Maps (NG-CHMs) allow for
 License: GPL-3
 URL: https://md-anderson-bioinformatics.github.io/NGCHM-R/,
         https://github.com/MD-Anderson-Bioinformatics/NGCHM-R
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 Imports: digest, grDevices, htmltools, httr, jsonlite, logger (>=
         0.2.0), methods, stats, tsvio, utils
 Suggests: knitr, rmarkdown, Rtsne, testthat, umap, uwot
@@ -34,12 +34,12 @@ Collate: 'internalFunctions.R' 'allClasses.R' 'allGenerics.R'
         'package.R'
 SystemRequirements: Java (>= 11) Git
 NeedsCompilation: no
-Packaged: 2024-05-08 13:03:06 UTC; marohrdanz
+Packaged: 2024-12-17 18:52:10 UTC; marohrdanz
 Author: Bradley M Broom [aut] (<https://orcid.org/0000-0002-0915-3164>),
   Mary A Rohrdanz [ctb, cre],
   Chris Wakefield [ctb],
-  James Melott [ctb],
+  James M Melott [ctb],
   MD Anderson Cancer Center [cph]
 Maintainer: Mary A Rohrdanz <marohrdanz@mdanderson.org>
 Repository: CRAN
-Date/Publication: 2024-05-08 21:10:10 UTC
+Date/Publication: 2024-12-17 19:40:02 UTC

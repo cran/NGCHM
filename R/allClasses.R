@@ -1,9 +1,9 @@
 #' @import methods
-setOldClass("dendrogram")
-setOldClass("hclust")
-setOldClass("file")
-setOldClass("fileContent")
-setOldClass("singleElement")
+setClass("dendrogram")
+setClass("hclust")
+setClass("file")
+setClass("fileContent")
+setClass("singleElement")
 #' Optional Dendrogram
 #'
 ## @exportClass optDendrogram
